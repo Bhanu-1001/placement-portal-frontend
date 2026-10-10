@@ -1,29 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Placement Portal</title>
+<style>
+body{font-family:Arial;background:#f4f6f9;padding:20px}
+.container{max-width:600px;margin:auto;background:white;padding:20px;border-radius:10px;box-shadow:0 0 10px #ccc}
+input,button{width:100%;padding:10px;margin:8px 0;border-radius:5px;border:1px solid #ccc}
+button{background:#007bff;color:white;border:none;cursor:pointer}
+button:hover{background:#0056b3}
+.student{border:1px solid #ddd;padding:10px;margin:10px 0;border-radius:5px}
+h2{text-align:center}
+</style>
+</head>
+<body>
+<div class="container">
+<h2>Student Internship & Placement Portal</h2>
+<h3>Add Student</h3>
+<input id="name" placeholder="Name">
+<input id="email" placeholder="Email">
+<input id="branch" placeholder="Branch (CSE/ECE)">
+<input id="cgpa" placeholder="CGPA">
+<input id="skills" placeholder="Skills (Java, Python)">
+<button onclick="addStudent()">Add Student</button>
+<h3>All Students</h3>
+<button onclick="loadStudents()">Load Students</button>
+<div id="list"></div>
+</div>
 <script>
-async function loadStudents() {
-  let res = await fetch("/students");
-  let data = await res.json();
-  let table = document.getElementById("studentTable");
-  table.innerHTML = "";
-  data.forEach(s => {
-    table.innerHTML += `<tr><td>${s.id}</td><td>${s.name}</td><td>${s.email}</td><td>${s.branch}</td><td>${s.cgpa}</td><td>${s.skills}</td></tr>`;
-  });
+const API="http://localhost:8080/api/students";
+async function addStudent(){
+ const data={
+   name:document.getElementById("name").value,
+   email:document.getElementById("email").value,
+   branch:document.getElementById("branch").value,
+   cgpa:document.getElementById("cgpa").value,
+   skills:document.getElementById("skills").value
+ };
+ const res=await fetch(API,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(data)});
+ if(res.ok){alert("Student Added!");loadStudents();}
 }
-
-async function addStudent() {
-  let student = {
-    name: document.getElementById("name").value,
-    email: document.getElementById("email").value,
-    branch: document.getElementById("branch").value,
-    cgpa: document.getElementById("cgpa").value,
-    skills: document.getElementById("skills").value
-  };
-
-  await fetch("/students", {
-    method: "POST",
-    headers: {"Content-Type": "application/json"},
-    body: JSON.stringify(student)
-  });
-  loadStudents();
+async function loadStudents(){
+ const res=await fetch(API);
+ const students=await res.json();
+ const div=document.getElementById("list");
+ div.innerHTML="";
+ students.forEach(s=>{
+   div.innerHTML+=`<div class="student"><b>${s.name}</b> - ${s.email}<br>Branch: ${s.branch} | CGPA: ${s.cgpa}<br>Skills: ${s.skills}</div>`;
+ });
 }
 loadStudents();
 </script>
+</body>
+</html>
